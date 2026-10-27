@@ -71,6 +71,19 @@ Professional HTML/CSS Website
 - Reviewed inbound Security Group rules.
 - Did not upload private keys or credentials to the repository.
 
+### Inbound Security Group Rules
+
+| Protocol | Port | Source | Purpose |
+|---|---:|---|---|
+| SSH | 22 | Restricted public IP (`/32`) | Secure administrative access |
+| HTTP | 80 | Public internet (`0.0.0.0/0`) | Serve the public website |
+
+**Security Notes:**
+- SSH access is restricted to a specific public IP address.
+- HTTP is publicly accessible so visitors can view the website.
+- HTTPS/TLS is not configured in this learning project.
+- Never commit private SSH keys or credentials to GitHub.
+
 ## Skills Practiced
 
 - AWS EC2 fundamentals
