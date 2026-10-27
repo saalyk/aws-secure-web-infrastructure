@@ -16,6 +16,29 @@ The goal is to practice foundational AWS infrastructure, Linux administration, n
 - **Access Management:** EC2 Security Groups and SSH key-based authentication
 - **Region:** Asia Pacific (Sydney)
 
+### Request Flow
+
+```text
+User's Browser
+      |
+      | HTTP (Port 80)
+      v
+AWS Security Group
+      |
+      v
+EC2 Instance
+(Amazon Linux 2023)
+      |
+      v
+Apache HTTP Server
+      |
+      v
+/var/www/html/index.html
+      |
+      v
+Professional HTML/CSS Website
+```
+
 ## Implementation
 
 1. Launched an EC2 instance using Amazon Linux 2023.
