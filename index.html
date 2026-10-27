@@ -1,0 +1,455 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AWS Secure Web Infrastructure project demonstrating EC2, Amazon Linux, Apache, security groups, and Linux troubleshooting.">
+    <title>AWS Secure Web Infrastructure | Cloud Project</title>
+
+    <style>
+        :root {
+            --bg: #0b1120;
+            --panel: #111c30;
+            --border: #24334c;
+            --text: #edf4ff;
+            --muted: #a7b6cc;
+            --blue: #38bdf8;
+            --green: #34d399;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.7;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(1080px, 90%);
+            margin: auto;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border);
+            background: rgba(11, 17, 32, 0.95);
+        }
+
+        nav {
+            min-height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+
+        .brand span {
+            color: var(--blue);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--blue);
+        }
+
+        .hero {
+            padding: 90px 0 75px;
+            background:
+                radial-gradient(ellipse at top right, #15385b 0%, transparent 45%);
+        }
+
+        .eyebrow {
+            color: var(--green);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            max-width: 800px;
+            margin: 18px 0;
+            font-size: clamp(2.4rem, 6vw, 4.5rem);
+            line-height: 1.12;
+            letter-spacing: -2px;
+        }
+
+        h1 span {
+            color: var(--blue);
+        }
+
+        .hero p {
+            max-width: 690px;
+            color: var(--muted);
+            font-size: 1.08rem;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+        }
+
+        .button.primary {
+            background: var(--blue);
+            color: #06111d;
+            border-color: var(--blue);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        section {
+            padding: 65px 0;
+        }
+
+        .section-heading {
+            margin-bottom: 28px;
+        }
+
+        .section-heading h2 {
+            font-size: clamp(1.7rem, 4vw, 2.3rem);
+            margin-bottom: 8px;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            padding: 24px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+        }
+
+        .card .icon {
+            font-size: 1.7rem;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .tag {
+            padding: 6px 11px;
+            border-radius: 6px;
+            background: #172a42;
+            color: #b9eaff;
+            font-size: 0.82rem;
+        }
+
+        .case-study {
+            border-left: 3px solid var(--green);
+        }
+
+        .case-study .result {
+            margin-top: 16px;
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .note {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-top: 18px;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 26px 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 760px) {
+            nav {
+                padding: 18px 0;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 65px 0 55px;
+            }
+
+            h1 {
+                letter-spacing: -1px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="container">
+            <a class="brand" href="#">CLOUD<span>LAB</span></a>
+
+            <div class="nav-links">
+                <a href="#architecture">Architecture</a>
+                <a href="#security">Security</a>
+                <a href="#troubleshooting">Troubleshooting</a>
+                <a href="#about">About</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="eyebrow">AWS Cloud Engineering Project</div>
+
+                <h1>
+                    Building a Secure<br>
+                    <span>Cloud Web Server.</span>
+                </h1>
+
+                <p>
+                    A hands-on AWS project demonstrating EC2 provisioning,
+                    Linux administration, Apache web hosting, network access
+                    control, and real-world troubleshooting.
+                </p>
+
+                <div class="actions">
+                    <a class="button primary"
+                       href="https://github.com/saalyk/aws-secure-web-infrastructure"
+                       target="_blank" rel="noopener noreferrer">
+                        View GitHub Project ↗
+                    </a>
+
+                    <a class="button" href="#architecture">
+                        Explore Architecture ↓
+                    </a>
+                </div>
+
+                <div class="tag-list">
+                    <span class="tag">AWS EC2</span>
+                    <span class="tag">Amazon Linux 2023</span>
+                    <span class="tag">Apache HTTP Server</span>
+                    <span class="tag">Linux</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Infrastructure Overview</h2>
+                    <p>The main components used to build this project.</p>
+                </div>
+
+                <div class="grid">
+                    <article class="card">
+                        <div class="icon">☁️</div>
+                        <h3>Amazon EC2</h3>
+                        <p>
+                            A virtual server used to host and test the
+                            web application in the AWS cloud.
+                        </p>
+                    </article>
+
+                    <article class="card">
+                        <div class="icon">🐧</div>
+                        <h3>Amazon Linux 2023</h3>
+                        <p>
+                            Linux command-line administration, package
+                            installation, service management, and log analysis.
+                        </p>
+                    </article>
+
+                    <article class="card">
+                        <div class="icon">🌐</div>
+                        <h3>Apache HTTP Server</h3>
+                        <p>
+                            Configured Apache to serve a custom HTML page
+                            over HTTP on port 80.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="security">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Security & Access Control</h2>
+                    <p>Basic security practices applied during deployment.</p>
+                </div>
+
+                <div class="grid">
+                    <article class="card">
+                        <h3>SSH Key Authentication</h3>
+                        <p>
+                            Connected to the Linux server using a private
+                            key instead of password-based SSH login.
+                        </p>
+                    </article>
+
+                    <article class="card">
+                        <h3>Restricted SSH Access</h3>
+                        <p>
+                            Limited inbound SSH access to a specific public
+                            IP address through the EC2 Security Group.
+                        </p>
+                    </article>
+
+                    <article class="card">
+                        <h3>HTTP Access</h3>
+                        <p>
+                            Allowed inbound HTTP traffic on port 80 so
+                            visitors could reach the test website.
+                        </p>
+                    </article>
+                </div>
+
+                <p class="note">
+                    This is a learning environment. HTTPS/TLS and
+                    production hardening have not yet been configured.
+                </p>
+            </div>
+        </section>
+
+        <section id="troubleshooting">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Real-World Troubleshooting</h2>
+                    <p>Investigating an issue, finding the cause, and verifying the fix.</p>
+                </div>
+
+                <article class="card case-study">
+                    <div class="eyebrow">Case Study · Apache</div>
+                    <h3 style="margin-top: 10px;">HTTP 403 Forbidden</h3>
+
+                    <p>
+                        <strong>Problem:</strong> A local HTTP request
+                        returned a 403 response after Apache was installed.
+                    </p>
+
+                    <p style="margin-top: 10px;">
+                        <strong>Investigation:</strong> Inspected the Apache
+                        error log and checked the web root directory.
+                    </p>
+
+                    <p style="margin-top: 10px;">
+                        <strong>Root cause:</strong> The web root did not
+                        contain an index.html file, and directory listing
+                        was disabled.
+                    </p>
+
+                    <p style="margin-top: 10px;">
+                        <strong>Resolution:</strong> Created a homepage
+                        at /var/www/html/index.html.
+                    </p>
+
+                    <p class="result">
+                        Verified: HTTP 403 → HTTP 200 OK
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Project Goals</h2>
+                    <p>
+                        Practising practical cloud support and infrastructure
+                        skills through hands-on implementation.
+                    </p>
+                </div>
+
+                <div class="grid">
+                    <article class="card">
+                        <h3>Linux Administration</h3>
+                        <p>Manage services, inspect logs, and troubleshoot system issues.</p>
+                    </article>
+
+                    <article class="card">
+                        <h3>Cloud Fundamentals</h3>
+                        <p>Understand compute resources, networking, and access controls.</p>
+                    </article>
+
+                    <article class="card">
+                        <h3>Documentation</h3>
+                        <p>Record architecture, implementation steps, and verified fixes.</p>
+                    </article>
+                </div>
+
+                <p class="note">
+                    Educational portfolio project — not intended for
+                    production use. AWS resource usage and costs should
+                    be monitored independently.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            AWS Secure Web Infrastructure · Built for hands-on learning
+        </div>
+    </footer>
+</body>
+</html>
